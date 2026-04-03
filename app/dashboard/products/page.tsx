@@ -67,7 +67,7 @@ export default function ProductsPage() {
         };
 
         setUserBalance(demoBalance);
-        setCurrentUser(demoUser);
+setCurrentUser(demoUser as any);
         localStorage.setItem('user_session', JSON.stringify(demoUser));
       }
     } catch (error) {
@@ -83,7 +83,8 @@ export default function ProductsPage() {
       };
 
       setUserBalance(demoBalance);
-      setCurrentUser(demoUser);
+setCurrentUser(demoUser as any);
+
       localStorage.setItem('user_session', JSON.stringify(demoUser));
     } finally {
       setLoading(false);
