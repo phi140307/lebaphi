@@ -49,7 +49,7 @@ export default function AdminSettingsPage() {
     }
 
     const session = getAdminSession();
-    if (!session || !session.permissions?.admin_management) {
+    if (!session || !(session.permissions as any)?.admin_management) {
       router.push('/admin/dashboard');
       return;
     }
