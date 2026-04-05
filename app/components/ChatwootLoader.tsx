@@ -14,7 +14,7 @@ export default function ChatwootLoader() {
     script.onload = () => {
       try {
         (window as any).chatwootSDK?.run?.({
-          websiteToken: 'oG8ERRkiFnUeZZBcsmKbZ8pd',
+          websiteToken: 'apNL6oKrkERgKknDoQQkFSmf',
           baseUrl: BASE_URL,
         });
       } catch (err) {
@@ -22,7 +22,6 @@ export default function ChatwootLoader() {
       }
     };
     document.body.appendChild(script);
-    return () => {};
   }, []);
 
   return null;
