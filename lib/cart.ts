@@ -20,7 +20,7 @@ export interface Order {
   status: 'pending' | 'processing' | 'completed' | 'cancelled';
   createdAt: string;
   updatedAt: string;
-  paymentMethod: 'balance' | 'stripe';
+  paymentMethod: 'balance' | 'sepay';
 }
 
 class CartManager {

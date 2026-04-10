@@ -485,7 +485,7 @@ export default function AdminOrdersPage() {
               >
                 <option value="all">Tất cả thanh toán</option>
                 <option value="balance">Số dư</option>
-                <option value="stripe">Thẻ tín dụng</option>
+                <option value="sepay">SePay</option>
               </select>
             </div>
 

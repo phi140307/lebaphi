@@ -18,7 +18,7 @@ export interface Order {
   items: OrderItem[];
   total_amount: number; // Đổi từ totalAmount thành total_amount
   status: 'pending' | 'processing' | 'completed' | 'cancelled' | 'failed';
-  payment_method: 'balance' | 'stripe'; // Đổi từ paymentMethod thành payment_method
+  payment_method: 'balance' | 'sepay'; // Đổi từ paymentMethod thành payment_method
   created_at: string; // Đổi từ createdAt thành created_at
   updated_at: string; // Đổi từ updatedAt thành updated_at
   completed_at?: string; // Đổi từ completedAt thành completed_at
@@ -27,7 +27,7 @@ export interface Order {
 export const createOrder = async (orderData: {
   items: OrderItem[];
   totalAmount: number;
-  paymentMethod: 'balance' | 'stripe';
+  paymentMethod: 'balance' | 'sepay';
   userId: string;
 }) => {
   const { data, error } = await supabase

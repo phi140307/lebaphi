@@ -3,9 +3,16 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { SePayPgClient } from 'sepay-pg-node';
 import { cartManager } from '../../../lib/cart';
 import { createOrder } from '../../../lib/orders';
 import { processPayment, getUserById, supabase } from '../../../lib/supabase';
+
+const sepayClient = new SePayPgClient({
+  env: 'sandbox',
+  merchant_id: process.env.NEXT_PUBLIC_SEPAY_MERCHANT_ID || 'MERCHANT_ID',
+  secret_key: process.env.NEXT_PUBLIC_SEPAY_SECRET_KEY || 'SECRET_KEY'
+});
 
 interface UserData {
   id: string;
@@ -18,7 +25,7 @@ interface UserData {
 
 export default function CheckoutPage() {
   const [items, setItems] = useState(cartManager.getItems());
-  const [paymentMethod, setPaymentMethod] = useState<'balance'>('balance');
+  const [paymentMethod, setPaymentMethod] = useState<'sepay'>('sepay');
   const [isProcessing, setIsProcessing] = useState(false);
   const [userBalance, setUserBalance] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -97,144 +104,57 @@ export default function CheckoutPage() {
   };
 
   const handlePayment = async () => {
-    if (paymentMethod === 'balance' && !hasEnoughBalance) {
-      alert('Số dư không đủ. Vui lòng nạp thêm tiền.');
-      return;
-    }
+    const orderId = `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-    setIsProcessing(true);
+    const orderData = {
+      id: orderId,
+      user_id: currentUser.id,
+      items: items,
+      total_amount: totalAmount,
+      payment_method: 'sepay',
+      status: 'processing' as const,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
 
     try {
-      // Tính toán số dư mới
-      const newBalance = userBalance - totalAmount;
-
-      if (newBalance < 0) {
-        throw new Error('Số dư không đủ để thanh toán');
-      }
-
-      // Tạo đơn hàng với ID duy nhất
-      const orderId = `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      const orderData = {
-        id: orderId,
-        user_id: currentUser.id,
-        items,
-        total_amount: totalAmount,
-        payment_method: paymentMethod,
-        status: 'processing' as const,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-
-      // Thử xử lý thanh toán với database trước
-      let paymentProcessed = false;
-      let orderSaved = false;
-
-      try {
-        const { data: paymentResult, error: paymentError } = await processPayment(currentUser.id, totalAmount);
-
-        if (!paymentError && paymentResult) {
-          paymentProcessed = true;
-          console.log('Thanh toán đã được xử lý qua database');
-        }
-      } catch (dbError) {
-        console.log('Không thể xử lý thanh toán qua database, sử dụng local storage');
-      }
-
-      // Thử tạo đơn hàng trong database
-      try {
-        const { data, error } = await supabase
-          .from('orders')
-          .insert([orderData])
-          .select();
-
-        if (!error && data) {
-          orderSaved = true;
-          console.log('Đơn hàng đã được lưu vào database');
-        }
-      } catch (orderError) {
-        console.log('Không thể lưu đơn hàng vào database:', orderError);
-      }
-
-      // Nếu không xử lý được qua database, xử lý local
-      if (!paymentProcessed) {
-        // Cập nhật số dư trong localStorage
-        const userSession = localStorage.getItem('user_session');
-        if (userSession) {
-          const userData: UserData = JSON.parse(userSession);
-          userData.balance = newBalance;
-          userData.total_spent = (userData.total_spent || 0) + totalAmount;
-          localStorage.setItem('user_session', JSON.stringify(userData));
-        }
-      }
-
-      // Lưu đơn hàng vào localStorage để đảm bảo hiển thị
-      if (!orderSaved) {
-        const savedOrders = JSON.parse(localStorage.getItem('user_orders') || '[]');
-        savedOrders.unshift(orderData); // Thêm vào đầu mảng
-        localStorage.setItem('user_orders', JSON.stringify(savedOrders));
-        console.log('Đơn hàng đã được lưu vào localStorage');
+      const { error } = await supabase.from('orders').insert([orderData]);
+      if (error) {
+        console.log('Lưu đơn hàng thất bại, dùng localStorage');
+        localStorage.setItem('pending_order', JSON.stringify(orderData));
       } else {
-        // Nếu đã lưu database thành công, cũng sync vào localStorage để đảm bảo
-        const savedOrders = JSON.parse(localStorage.getItem('user_orders') || '[]');
-        // Kiểm tra xem đơn hàng đã tồn tại chưa
-        const existingOrder = savedOrders.find((order: any) => order.id === orderId);
-        if (!existingOrder) {
-          savedOrders.unshift(orderData);
-          localStorage.setItem('user_orders', JSON.stringify(savedOrders));
-        }
+        console.log('Đơn hàng đã lưu vào database');
       }
-
-      // Cập nhật state
-      setUserBalance(newBalance);
-
-      // Thử gửi email thông báo (không chặn tiến trình)
-      try {
-        if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/send-order-notification`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-              },
-              body: JSON.stringify({
-                orderId: orderId,
-                customerName: currentUser.username,
-                customerEmail: currentUser.email,
-                totalAmount,
-                paymentMethod,
-                items,
-                status: 'processing'
-              }),
-            }
-          );
-
-          if (response.ok) {
-            console.log('Email thông báo đã được gửi');
-          }
-        }
-      } catch (emailError) {
-        console.log('Không thể gửi email thông báo:', emailError);
-      }
-
-      // Xóa giỏ hàng
-      cartManager.clear();
-
-      // Hiển thị thông báo thành công
-      alert(`Thanh toán thành công! Đơn hàng ${orderId.slice(-8)} đang được xử lý. Số dư còn lại: ${newBalance.toLocaleString()}đ`);
-
-      // Sử dụng router.push thay vì window.location để tránh lỗi
-      router.push('/dashboard/orders/success');
-
-    } catch (error) {
-      console.error('Payment error:', error);
-
-      const errorMessage = error instanceof Error ? error.message : 'Có lỗi không xác định xảy ra';
-      alert(`Lỗi thanh toán: ${errorMessage}`);
-    } finally {
-      setIsProcessing(false);
+    } catch (e) {
+      localStorage.setItem('pending_order', JSON.stringify(orderData));
     }
+
+    const checkoutURL = sepayClient.checkout.initCheckoutUrl();
+    const checkoutFormfields = sepayClient.checkout.initOneTimePaymentFields({
+      payment_method: 'BANK_TRANSFER',
+      order_invoice_number: orderId,
+      order_amount: totalAmount,
+      currency: 'VND',
+      order_description: `Thanh toán đơn hàng ${orderId}`,
+      success_url: `${window.location.origin}/dashboard/orders/success?payment=success&orderId=${orderId}`,
+      error_url: `${window.location.origin}/dashboard/checkout?payment=error`,
+      cancel_url: `${window.location.origin}/dashboard/checkout?payment=cancel`,
+    });
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = checkoutURL;
+    
+    Object.entries(checkoutFormfields).forEach(([key, value]) => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = String(value);
+      form.appendChild(input);
+    });
+    
+    document.body.appendChild(form);
+    form.submit();
   };
 
   if (items.length === 0) {
@@ -334,31 +254,23 @@ export default function CheckoutPage() {
                   <div className="flex items-start space-x-3">
                     <input
                       type="radio"
-                      id="balance"
+                      id="sepay"
                       name="payment"
-                      value="balance"
-                      checked={paymentMethod === 'balance'}
-                      onChange={(e) => setPaymentMethod(e.target.value as 'balance')}
+                      value="sepay"
+                      checked={paymentMethod === 'sepay'}
+                      onChange={(e) => setPaymentMethod(e.target.value as 'sepay')}
                       className="mt-1"
                     />
-                    <label htmlFor="balance" className="flex-1">
+                    <label htmlFor="sepay" className="flex-1">
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="font-medium text-gray-900">Số dư tài khoản</div>
+                          <div className="font-medium text-gray-900">Thanh toán qua SePay</div>
                           <div className="text-sm text-gray-500">
-                            Số dư hiện tại: {userBalance.toLocaleString()}đ
+                            Hỗ trợ chuyển khoản ngân hàng
                           </div>
                         </div>
-                        <i className="ri-wallet-3-line text-2xl text-green-600"></i>
+                        <i className="ri-bank-card-line text-2xl text-blue-600"></i>
                       </div>
-                      {!hasEnoughBalance && (
-                        <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                          <p className="text-sm text-red-600">
-                            <i className="ri-error-warning-line mr-1"></i>
-                            Số dư không đủ. Thiếu {(totalAmount - userBalance).toLocaleString()}đ
-                          </p>
-                        </div>
-                      )}
                     </label>
                   </div>
                 </div>
@@ -405,21 +317,13 @@ export default function CheckoutPage() {
                     </div>
                   ) : (
                     <div className="flex items-center justify-center">
-                      <i className="ri-secure-payment-line mr-2"></i>
-                      Xác nhận thanh toán
+                      <i className={paymentMethod === 'sepay' ? 'ri-bank-card-line mr-2' : 'ri-secure-payment-line mr-2'}></i>
+                      {paymentMethod === 'sepay' ? 'Thanh toán với SePay' : 'Xác nhận thanh toán'}
                     </div>
                   )}
                 </button>
 
-                {paymentMethod === 'balance' && !hasEnoughBalance && (
-                  <Link
-                    href="/dashboard/deposit"
-                    className="w-full mt-3 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium text-center block whitespace-nowrap"
-                  >
-                    <i className="ri-add-circle-line mr-2"></i>
-                    Nạp tiền ngay
-                  </Link>
-                )}
+                
 
                 <div className="mt-6 pt-4 border-t border-gray-200">
                   <div className="flex items-center text-sm text-gray-500">

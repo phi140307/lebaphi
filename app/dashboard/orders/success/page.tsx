@@ -3,11 +3,28 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { cartManager } from '../../../../lib/cart';
 
 export default function OrderSuccessPage() {
   const [countdown, setCountdown] = useState(10);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [paymentStatus, setPaymentStatus] = useState<string>('pending');
+
+  useEffect(() => {
+    const orderIdParam = searchParams.get('orderId');
+    const paymentParam = searchParams.get('payment');
+    
+    if (orderIdParam) {
+      setOrderId(orderIdParam);
+      setPaymentStatus(paymentParam || 'pending');
+      console.log('Order created:', orderIdParam, 'Payment status:', paymentParam);
+      cartManager.clear();
+      localStorage.removeItem('pending_order');
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -31,12 +48,19 @@ export default function OrderSuccessPage() {
           <i className="ri-check-line text-4xl text-green-600"></i>
         </div>
         
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Đặt hàng thành công!</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Đơn hàng đã được tạo!</h1>
         
-        <p className="text-gray-600 mb-8">
-          Cảm ơn bạn đã đặt hàng. Đơn hàng của bạn đang được xử lý và sẽ được hoàn thành trong thời gian sớm nhất.
+        <p className="text-gray-600 mb-4">
+          Vui lòng hoàn tất thanh toán qua ngân hàng. Đơn hàng sẽ được xác nhận sau khi thanh toán thành công.
         </p>
 
+        {orderId && (
+          <div className="mb-6 p-4 bg-gray-100 rounded-lg">
+            <p className="text-sm text-gray-600">Mã đơn hàng:</p>
+            <p className="font-mono font-bold text-gray-900">{orderId}</p>
+          </div>
+        )}
+        
         <div className="space-y-4">
           <Link
             href="/dashboard/orders"
