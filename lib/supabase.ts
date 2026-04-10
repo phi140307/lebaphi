@@ -29,22 +29,45 @@ export const registerUser = async (userData: {
   full_name?: string
   phone?: string
 }) => {
-  const { data, error } = await supabase
-    .from('users')
-    .insert([
-      {
-        username: userData.username,
-        email: userData.email,
-        password_hash: userData.password, // In production, hash the password
-        full_name: userData.full_name,
-        phone: userData.phone,
-        total_deposited: 0,
-        total_spent: 0
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email: userData.email,
+      password: userData.password,
+      options: {
+        data: {
+          username: userData.username,
+          full_name: userData.full_name,
+        }
       }
-    ])
-    .select()
+    })
 
-  return { data, error }
+    if (error) throw error
+
+    if (data.user) {
+      const { error: profileError } = await supabase
+        .from('users')
+        .insert([
+          {
+            id: data.user.id,
+            username: userData.username,
+            email: userData.email,
+            full_name: userData.full_name,
+            balance: 0,
+            total_deposited: 0,
+            total_spent: 0,
+            status: 'active'
+          }
+        ])
+
+      if (profileError) {
+        console.error('Profile creation error:', profileError)
+      }
+    }
+
+    return { data, error: null }
+  } catch (error: any) {
+    return { data: null, error }
+  }
 }
 
 export const getUsers = async () => {
@@ -170,26 +193,38 @@ export const createDepositTransaction = async (transactionData: {
 }
 
 export const loginUser = async (username: string, password: string) => {
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('username', username)
-    .eq('password_hash', password)
-    .eq('status', 'active')
-    .single()
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: username.includes('@') ? username : `${username}@placeholder.com`,
+      password: password,
+    })
 
-  if (data && !error) {
-    // Cập nhật thời gian đăng nhập cuối
-    await supabase
-      .from('users')
-      .update({
-        last_login: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', data.id)
+    if (error) throw error
+
+    if (data.user) {
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', data.user.id)
+        .single()
+
+      if (userError) throw userError
+
+      await supabase
+        .from('users')
+        .update({
+          last_login: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', data.user.id)
+
+      return { data: userData, error: null }
+    }
+
+    return { data: null, error: new Error('User not found') }
+  } catch (error: any) {
+    return { data: null, error }
   }
-
-  return { data, error }
 }
 
 export const updateUserTotals = async (userId: string, depositAmount?: number, spentAmount?: number) => {
