@@ -1,5 +1,5 @@
 
-'use client';
+// Login page - Updated
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
