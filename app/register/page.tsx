@@ -62,26 +62,22 @@ export default function Register() {
       console.log('Registration result:', result);
 
       if (result.error) {
-        const errorMsg = result.error.message || '';
-        if (errorMsg.includes('already exists') || errorMsg.includes('already been taken')) {
-          setMessage('Email đã được sử dụng');
-        } else if (errorMsg.includes('Password')) {
-          setMessage('Mật khẩu không hợp lệ');
-        } else {
-          setMessage('Lỗi đăng ký: ' + errorMsg);
-        }
-        setMessageType('error');
-        setIsLoading(false);
-        return;
+        const err = result.error
+        const errorMsg = err.message || err.name || 'Unknown error'
+        console.log('Full error:', err)
+        setMessage('Lỗi: ' + errorMsg)
+        setMessageType('error')
+        setIsLoading(false)
+        return
       }
 
-      setMessage('Đăng ký thành công! Vui lòng kiểm tra email để xác nhận.');
-      setMessageType('success');
+      setMessage('Đăng ký thành công! Vui lòng kiểm tra email để xác nhận.')
+      setMessageType('success')
       
       setTimeout(() => {
-        router.push('/login');
-        setIsLoading(false);
-      }, 3000);
+        router.push('/login')
+        setIsLoading(false)
+      }, 3000)
 
     } catch (err: any) {
       console.error('Register catch error:', err);

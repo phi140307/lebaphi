@@ -42,14 +42,16 @@ export const registerUser = async (userData: {
     })
 
     if (error) {
-      console.error('Auth signUp error:', error)
-      throw error
+      console.error('Auth signUp error details:', {
+        message: error.message,
+        status: error.status,
+        name: error.name
+      })
+      return { data: null, error }
     }
 
-    console.log('Auth user created:', data.user?.id)
-
     if (data.user) {
-      const { error: profileError } = await supabase
+      await supabase
         .from('users')
         .insert([
           {
@@ -63,16 +65,18 @@ export const registerUser = async (userData: {
             status: 'active'
           }
         ])
-
-      if (profileError) {
-        console.error('Profile insert error:', profileError)
-      }
     }
 
     return { data, error: null }
   } catch (error: any) {
-    console.error('Register error:', error.message || error)
-    return { data: null, error }
+    console.error('Register catch error:', error)
+    return { 
+      data: null, 
+      error: {
+        message: error.message || 'Unknown error',
+        name: error.name || 'Error'
+      }
+    }
   }
 }
 
