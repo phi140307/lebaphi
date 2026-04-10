@@ -2,14 +2,11 @@
 import ProductDetail from './ProductDetail';
 
 export async function generateStaticParams() {
-  // Tạo danh sách tất cả ID sản phẩm có thể có
-  const productIds = [];
-  for (let i = 1; i <= 50; i++) {
-    productIds.push({ id: i.toString() });
-  }
-  return productIds;
+  return Array.from({ length: 59 }, (_, index) => ({ id: String(index + 1) }));
 }
 
-export default function ProductDetailPage({ params }: { params: { id: string } }) {
-  return <ProductDetail productId={params.id} />;
+export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+
+  return <ProductDetail productId={id} />;
 }

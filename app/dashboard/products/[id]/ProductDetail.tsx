@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { cartManager } from '../../../../lib/cart';
+import { useParams } from 'next/navigation';
 import { getProductImage } from '../../../../lib/product-images';
 
 const allProducts = [
@@ -981,7 +982,9 @@ interface ProductDetailProps {
 }
 
 export default function ProductDetail({ productId }: ProductDetailProps) {
-  const productIdNum = parseInt(productId);
+  const params = useParams<{ id: string }>();
+  const resolvedProductId = productId || params?.id || '';
+  const productIdNum = parseInt(resolvedProductId, 10);
   const product = allProducts.find(p => p.id === productIdNum);
 
   const [selectedServer, setSelectedServer] = useState('');
@@ -1019,7 +1022,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
             <i className="ri-error-warning-line text-3xl text-gray-400"></i>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Không tìm thấy sản phẩm</h1>
-          <p className="text-gray-500 mb-6">Sản phẩm ID #{productId} không tồn tại trong hệ thống</p>
+          <p className="text-gray-500 mb-6">Sản phẩm ID #{resolvedProductId || productId} không tồn tại trong hệ thống</p>
           <Link
             href="/dashboard/products"
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"

@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { cartManager } from '../../../lib/cart';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { getProductImage } from '../../../lib/product-images';
 
 const products = [
@@ -1182,7 +1182,9 @@ interface ProductDetailProps {
 }
 
 export default function ProductDetail({ productId }: ProductDetailProps) {
-  const productIdNum = parseInt(productId);
+  const params = useParams<{ id: string }>();
+  const resolvedProductId = productId || params?.id || '';
+  const productIdNum = parseInt(resolvedProductId, 10);
   const product = products.find((p) => p.id === productIdNum) || fallbackProducts.find((p) => p.id === productIdNum);
   const router = useRouter();
 
