@@ -25,9 +25,7 @@ interface UserData {
 
 export default function CheckoutPage() {
   const [items, setItems] = useState(cartManager.getItems());
-  const [paymentMethod, setPaymentMethod] = useState<'sepay'>('sepay');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [userBalance, setUserBalance] = useState(0);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<UserData>({
     id: 'user_demo_123',
@@ -37,7 +35,6 @@ export default function CheckoutPage() {
   const router = useRouter();
 
   const totalAmount = cartManager.getTotalAmount();
-  const hasEnoughBalance = userBalance >= totalAmount;
 
   useEffect(() => {
     if (items.length === 0) {
@@ -48,54 +45,26 @@ export default function CheckoutPage() {
 
   const loadUserData = async () => {
     try {
-      // Lấy thông tin người dùng từ localStorage
       const userSession = localStorage.getItem('user_session');
       if (userSession) {
         const userData: UserData = JSON.parse(userSession);
         setCurrentUser(userData);
-
-        // Thử lấy số dư từ database
-        try {
-          const { data, error } = await getUserById(userData.id);
-          if (!error && data) {
-            setUserBalance(data.balance || 0);
-            // Cập nhật localStorage với số dư mới nhất
-            userData.balance = data.balance || 0;
-            localStorage.setItem('user_session', JSON.stringify(userData));
-          } else {
-            // Fallback từ session nếu không lấy được từ DB
-            setUserBalance(userData.balance || 0);
-          }
-        } catch (dbError) {
-          console.log('Không thể kết nối database, sử dụng dữ liệu local');
-          setUserBalance(userData.balance || 0);
-        }
       } else {
-        // Không có session, tạo demo user với số dư 100k
-        const demoBalance = 100000;
         const demoUser: UserData = {
           id: 'user_demo_123',
           username: 'demo_user',
           email: 'demo@example.com',
-          balance: demoBalance
         };
-
-        setUserBalance(demoBalance);
         setCurrentUser(demoUser);
         localStorage.setItem('user_session', JSON.stringify(demoUser));
       }
     } catch (error) {
       console.error('Error loading user data:', error);
-      // Fallback với demo user
-      const demoBalance = 100000;
       const demoUser: UserData = {
         id: 'user_demo_123',
         username: 'demo_user',
         email: 'demo@example.com',
-        balance: demoBalance
       };
-
-      setUserBalance(demoBalance);
       setCurrentUser(demoUser);
       localStorage.setItem('user_session', JSON.stringify(demoUser));
     } finally {
@@ -257,8 +226,7 @@ export default function CheckoutPage() {
                       id="sepay"
                       name="payment"
                       value="sepay"
-                      checked={paymentMethod === 'sepay'}
-                      onChange={(e) => setPaymentMethod(e.target.value as 'sepay')}
+                      checked={true}
                       className="mt-1"
                     />
                     <label htmlFor="sepay" className="flex-1">
@@ -307,7 +275,7 @@ export default function CheckoutPage() {
 
                 <button
                   onClick={handlePayment}
-                  disabled={isProcessing || (paymentMethod === 'balance' && !hasEnoughBalance)}
+                  disabled={isProcessing}
                   className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-colors font-medium whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isProcessing ? (
@@ -317,8 +285,8 @@ export default function CheckoutPage() {
                     </div>
                   ) : (
                     <div className="flex items-center justify-center">
-                      <i className={paymentMethod === 'sepay' ? 'ri-bank-card-line mr-2' : 'ri-secure-payment-line mr-2'}></i>
-                      {paymentMethod === 'sepay' ? 'Thanh toán với SePay' : 'Xác nhận thanh toán'}
+                      <i className="ri-bank-card-line mr-2"></i>
+                      Thanh toán với SePay
                     </div>
                   )}
                 </button>
