@@ -37,31 +37,31 @@ export function getProductImage(product: ProductLike, size: number): ProductImag
   const seed = String(product.id ?? product.name);
 
   if (name.includes('perplexity')) {
-    return { type: 'image', src: localLogo('/product-logos/perplexity.svg'), alt: product.name, fit: 'contain' };
+    return { type: 'image', src: localLogo('/product-logos/perplexity.png'), alt: product.name, fit: 'contain' };
   }
 
   if (name.includes('chatgpt')) {
-    return { type: 'image', src: localLogo('/product-logos/chatgpt-plus.svg'), alt: product.name, fit: 'contain' };
+    return { type: 'image', src: localLogo('/product-logos/chatgpt-plus.png'), alt: product.name, fit: 'contain' };
   }
 
   if (name.includes('canva')) {
-    return { type: 'image', src: localLogo('/product-logos/canva.svg'), alt: product.name, fit: 'contain' };
+    return { type: 'image', src: localLogo('/product-logos/canva.png'), alt: product.name, fit: 'contain' };
   }
 
   if (name.includes('capcut')) {
-    return { type: 'image', src: localLogo('/product-logos/capcut.svg'), alt: product.name, fit: 'contain' };
+    return { type: 'image', src: localLogo('/product-logos/capcut.png'), alt: product.name, fit: 'contain' };
   }
 
   if (name.includes('kling')) {
-    return { type: 'image', src: localLogo('/product-logos/kling-ai.svg'), alt: product.name, fit: 'contain' };
+    return { type: 'image', src: localLogo('/product-logos/kling-ai.png'), alt: product.name, fit: 'contain' };
   }
 
   if (name.includes('veo')) {
-    return { type: 'image', src: localLogo('/product-logos/veo3.svg'), alt: product.name, fit: 'contain' };
+    return { type: 'image', src: localLogo('/product-logos/veo3.png'), alt: product.name, fit: 'contain' };
   }
 
   if (name.includes('grok')) {
-    return { type: 'image', src: localLogo('/product-logos/grok.svg'), alt: product.name, fit: 'contain' };
+    return { type: 'image', src: localLogo('/product-logos/grok.png'), alt: product.name, fit: 'contain' };
   }
 
   if (name.includes('gemini')) {
@@ -73,23 +73,23 @@ export function getProductImage(product: ProductLike, size: number): ProductImag
   }
 
   if (name.includes('netflix')) {
-    return { type: 'image', src: localLogo('/product-logos/netflix.svg'), alt: product.name, fit: 'contain' };
+    return { type: 'image', src: localLogo('/product-logos/netflix.png'), alt: product.name, fit: 'contain' };
   }
 
   if (name.includes('locket')) {
-    return { type: 'image', src: localLogo('/product-logos/locket-gold.svg'), alt: product.name, fit: 'contain' };
+    return { type: 'image', src: localLogo('/product-logos/locket-gold.png'), alt: product.name, fit: 'contain' };
   }
 
   if (name.includes('microsoft')) {
-    return { type: 'image', src: localLogo('/product-logos/microsoft-365.svg'), alt: product.name, fit: 'contain' };
+    return { type: 'image', src: localLogo('/product-logos/microsoft-365.png'), alt: product.name, fit: 'contain' };
   }
 
   if (name.includes('spotify')) {
-    return { type: 'image', src: localLogo('/product-logos/spotify.svg'), alt: product.name, fit: 'contain' };
+    return { type: 'image', src: localLogo('/product-logos/spotify.png'), alt: product.name, fit: 'contain' };
   }
 
   if (name.includes('quizlet')) {
-    return { type: 'image', src: localLogo('/product-logos/quizlet.svg'), alt: product.name, fit: 'contain' };
+    return { type: 'image', src: localLogo('/product-logos/quizlet.png'), alt: product.name, fit: 'contain' };
   }
 
   if (name.includes('duolingo')) {
