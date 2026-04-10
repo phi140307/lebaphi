@@ -1,0 +1,10 @@
+<svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="800" rx="64" fill="#58CC02"/>
+  <circle cx="400" cy="320" r="128" fill="#7BE52B"/>
+  <circle cx="350" cy="300" r="26" fill="white"/>
+  <circle cx="450" cy="300" r="26" fill="white"/>
+  <circle cx="350" cy="300" r="10" fill="#1F2937"/>
+  <circle cx="450" cy="300" r="10" fill="#1F2937"/>
+  <path d="M340 374C378 398 422 398 460 374" stroke="#1F2937" stroke-width="16" stroke-linecap="round"/>
+  <text x="400" y="610" fill="white" font-size="110" font-family="Arial, Helvetica, sans-serif" font-weight="800" text-anchor="middle">Duolingo Super</text>
+</svg>

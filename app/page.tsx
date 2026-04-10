@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { getProductImage } from '../lib/product-images';
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -903,6 +904,11 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="hero-orb absolute -left-16 top-24 h-56 w-56 rounded-full bg-violet-400/20 blur-3xl"></div>
+        <div className="hero-orb-delayed absolute right-0 top-80 h-72 w-72 rounded-full bg-cyan-400/20 blur-3xl"></div>
+        <div className="hero-orb-slow absolute bottom-16 left-1/3 h-64 w-64 rounded-full bg-fuchsia-400/10 blur-3xl"></div>
+      </div>
       {/* Support Notification Bar */}
       {showSupportNotification && (
         <div className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-4 py-3 relative">
@@ -982,6 +988,106 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      <section className="relative overflow-hidden border-b border-slate-200 bg-[radial-gradient(circle_at_top_left,_rgba(168,85,247,0.18),_transparent_25%),radial-gradient(circle_at_bottom_right,_rgba(59,130,246,0.16),_transparent_25%),linear-gradient(180deg,_#ffffff,_#f8fafc)]">
+        <div className="pointer-events-none absolute inset-0 opacity-60">
+          <div className="hero-grid absolute inset-0"></div>
+          <div className="absolute left-[8%] top-10 h-24 w-24 rounded-full border border-violet-200/80 bg-white/40"></div>
+          <div className="absolute right-[12%] top-16 h-16 w-16 rotate-12 rounded-2xl border border-cyan-200/80 bg-white/30"></div>
+          <div className="absolute bottom-10 right-[35%] h-20 w-20 rounded-full border border-fuchsia-200/80 bg-white/20"></div>
+        </div>
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+          <div className="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr]">
+            <div>
+              <div className="mb-4 inline-flex animate-[pulse_4s_ease-in-out_infinite] items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-medium text-violet-700 shadow-sm">
+                <i className="ri-sparkling-2-line"></i>
+                Social growth, premium tools, AI services
+              </div>
+              <h1 className="max-w-3xl text-4xl font-black leading-tight text-slate-900 sm:text-5xl">
+                Mua dịch vụ số nhanh hơn với giao diện gọn, rõ và hiện đại hơn.
+              </h1>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
+                Tăng tương tác mạng xã hội, mua tài khoản premium, công cụ AI và theo dõi đơn hàng trong cùng một hệ thống tối ưu cho tốc độ thao tác.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link
+                  href="/register"
+                  className="inline-flex items-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-300/30 transition duration-300 hover:-translate-y-0.5 hover:bg-violet-600 hover:shadow-violet-300/40"
+                >
+                  <span>Tạo tài khoản</span>
+                  <i className="ri-arrow-right-up-line"></i>
+                </Link>
+                <Link
+                  href="/dashboard/products"
+                  className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-violet-300 hover:text-violet-700 hover:shadow-lg hover:shadow-slate-200/70"
+                >
+                  <i className="ri-layout-grid-line"></i>
+                  Xem toàn bộ dịch vụ
+                </Link>
+              </div>
+              <div className="mt-8 grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-violet-100/80">
+                  <p className="text-2xl font-bold text-slate-900">60+</p>
+                  <p className="mt-1 text-sm text-slate-500">Sản phẩm</p>
+                </div>
+                <div className="rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-violet-100/80">
+                  <p className="text-2xl font-bold text-slate-900">24/7</p>
+                  <p className="mt-1 text-sm text-slate-500">Hỗ trợ</p>
+                </div>
+                <div className="rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-violet-100/80">
+                  <p className="text-2xl font-bold text-slate-900">Nhanh</p>
+                  <p className="mt-1 text-sm text-slate-500">Xử lý đơn</p>
+                </div>
+                <div className="rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-violet-100/80">
+                  <p className="text-2xl font-bold text-slate-900">Đẹp</p>
+                  <p className="mt-1 text-sm text-slate-500">UI mới</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+              <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-xl shadow-slate-200/60 transition duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-violet-100/70">
+                <div className="mb-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">Danh mục nổi bật</p>
+                    <p className="text-sm text-slate-500">Truy cập nhanh dịch vụ đang bán tốt</p>
+                  </div>
+                  <div className="rounded-2xl bg-violet-50 p-3 text-violet-600">
+                    <i className="ri-fire-line text-xl"></i>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  {categories.slice(1, 7).map((category) => (
+                    <button
+                      key={category.id}
+                      onClick={() => handleCategoryClick(category.id)}
+                      className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-slate-700 transition hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700"
+                    >
+                      <i className={`${category.icon} text-base`}></i>
+                      <span className="font-medium">{category.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-[28px] border border-slate-200 bg-slate-950 p-5 text-white shadow-xl shadow-slate-300/30 transition duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-slate-300/40">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="rounded-2xl bg-white/10 p-3">
+                    <i className="ri-customer-service-2-line text-xl"></i>
+                  </div>
+                  <div>
+                    <p className="font-semibold">Hỗ trợ trực tiếp</p>
+                    <p className="text-sm text-slate-300">Xử lý nhanh các vấn đề social và kỹ thuật</p>
+                  </div>
+                </div>
+                <p className="text-sm leading-6 text-slate-300">
+                  Bên mình vẫn hỗ trợ các vấn đề mở live, unlock, FAQ nền tảng và xử lý lỗi dịch vụ. Có thể liên hệ trực tiếp khi cần hỗ trợ riêng.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <div className="lg:hidden bg-white border-b px-4 py-2">
         <div className="flex items-center justify-between">
@@ -1086,320 +1192,116 @@ export default function Home() {
           </div>
 
           {selectedCategory !== 'all' && (
-            <div className="bg-gradient-to-r from-purple-500 to-blue-500 p-4 mb-4 text-white">
+            <div className="mb-5 overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-purple-900 to-blue-700 p-5 text-white shadow-xl shadow-purple-200/70">
               <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-white/20 rounded-lg flex items-center justify-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-white/20 bg-white/15 backdrop-blur">
                   <i
                     className={`${categories.find((c) => c.id === selectedCategory)?.icon} text-2xl`}
                   ></i>
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold mb-1">
+                  <h2 className="mb-1 text-xl font-bold">
                     {categories.find((c) => c.id === selectedCategory)?.name}
                   </h2>
-                  <p className="text-purple-100">{sortedProducts.length} sản phẩm có sẵn</p>
+                  <p className="text-sm text-purple-100">{sortedProducts.length} sản phẩm có sẵn</p>
                 </div>
               </div>
             </div>
           )}
 
           <div className="p-4" data-products-grid>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-              {sortedProducts.map((product) => (
-                <div
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              {sortedProducts.map((product) => {
+                const productImage = getProductImage(product, 200);
+
+                return <div
                   key={product.id}
-                  className="bg-white rounded-sm shadow-sm hover:shadow-md transition-shadow border border-gray-100"
+                  className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-slate-200/80"
                 >
-                  <div className="aspect-square bg-gray-100 relative overflow-hidden">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      {/* TikTok Products - Sử dụng hình ảnh mới */}
-                      {product.category === 'tiktok' && (
+                  <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100">
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/10 via-transparent to-white/40"></div>
+                    <div className="absolute left-3 top-3 z-10 rounded-full border border-white/70 bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-slate-700 shadow-sm backdrop-blur">
+                      {categories.find((c) => c.id === product.category)?.name || product.category}
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
+                      {productImage.type === 'image' ? (
                         <img
-                          src="https://static.readdy.ai/image/498805ced0a624268fdcefbf8368cbd9/74dc4a4dce6861ebcc79aa07c1ab0b14.png"
-                          alt={product.name}
-                          className="w-full h-full object-contain p-4"
+                          src={productImage.src}
+                          alt={productImage.alt}
+                          className={`h-full w-full ${productImage.fit === 'cover' ? 'object-cover' : 'object-contain p-3 sm:p-4'}`}
                         />
-                      )}
-
-                      {/* Facebook Products */}
-                      {product.category === 'facebook' && product.id === 6 && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=Facebook%20like%20button%20thumbs%20up%20social%20media%20engagement%20blue%20icon%20modern%20design%20digital%20interaction%20social%20network%20clean%20minimalist%20background%20professional%20sleek%20interface%20user%20engagement&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {product.category === 'facebook' && product.id === 7 && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=Facebook%20page%20follow%20button%20social%20media%20fanpage%20business%20page%20digital%20marketing%20blue%20interface%20modern%20design%20clean%20minimalist%20background%20professional%20social%20network%20engagement&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {product.category === 'facebook' && product.id === 8 && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=Facebook%20share%20button%20social%20media%20viral%20content%20sharing%20blue%20interface%20modern%20design%20clean%20minimalist%20background%20professional%20social%20network%20digital%20engagement&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {/* Instagram Products */}
-                      {product.category === 'instagram' && product.id === 9 && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=Instagram%20follow%20button%20pink%20gradient%20social%20media%20followers%20engagement%20modern%20design%20clean%20minimalist%20background%20professional%20social%20network%20interface%20user%20growth&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {product.category === 'instagram' && product.id === 10 && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=Instagram%20like%20heart%20button%20pink%20gradient%20social%20media%20engagement%20modern%20design%20clean%20minimalist%20background%20professional%20social%20network%20interface%20user%20interaction&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {product.category === 'instagram' && product.id === 11 && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=Instagram%20story%20views%20eye%20icon%20pink%20gradient%20social%20media%20engagement%20modern%20design%20clean%20minimalist%20background%20professional%20social%20network%20interface%20user%20interaction&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {/* YouTube Products */}
-                      {product.category === 'youtube' && product.id === 12 && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=YouTube%20subscribe%20button%20red%20play%20button%20video%20platform%20modern%20design%20clean%20minimalist%20background%20professional%20digital%20content%20creator%20channel%20growth&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {product.category === 'youtube' && product.id === 13 && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=YouTube%20like%20thumbs%20up%20button%20red%20video%20platform%20engagement%20modern%20design%20clean%20minimalist%20background%20professional%20digital%20content%20interaction&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {product.category === 'youtube' && product.id === 14 && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=YouTube%20video%20views%20play%20button%20red%20counter%20statistics%20modern%20design%20clean%20minimalist%20background%20professional%20digital%20content%20analytics&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {product.category === 'youtube' && product.id === 37 && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=YouTube%20Premium%20logo%20red%20play%20button%20premium%20service%20ad-free%20video%20streaming%20modern%20design%20clean%20minimalist%20background%20professional%20digital%20entertainment&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {/* Telegram Products */}
-                      {product.category === 'telegram' && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=Telegram%20messaging%20app%20blue%20airplane%20logo%20modern%20design%20clean%20minimalist%20background%20professional%20digital%20communication%20social%20media%20platform&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {/* Shopee Products */}
-                      {product.category === 'shopee' && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=Shopee%20online%20shopping%20platform%20orange%20logo%20e-commerce%20marketplace%20modern%20design%20clean%20minimalist%20background%20professional%20digital%20retail%20store&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {/* Premium Account Products */}
-                      {product.category === 'premium' && product.id === 22 && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=ChatGPT%20artificial%20intelligence%20AI%20chatbot%20logo%20modern%20design%20clean%20minimalist%20background%20professional%20technology%20digital%20assistant%20OpenAI&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {product.category === 'premium' && (product.id === 25 || product.id === 26 || product.id === 27) && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=Spotify%20music%20streaming%20platform%20green%20logo%20premium%20service%20modern%20design%20clean%20minimalist%20background%20professional%20digital%20entertainment%20audio&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {product.category === 'premium' && product.id === 42 && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=Locket%20Gold%20premium%20app%20widget%20photo%20sharing%20modern%20design%20clean%20minimalist%20background%20professional%20mobile%20application%20golden%20premium%20service&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {/* Design Products - Canva */}
-                      {product.category === 'design' && (product.id === 23 || product.id === 24) && (
-                        <img
-                          src="https://static.readdy.ai/image/498805ced0a624268fdcefbf8368cbd9/d85a64c4610bb2bdbb8d01a2e3cc28ab.png"
-                          alt="Canva Logo"
-                          className="w-full h-full object-contain p-4"
-                        />
-                      )}
-
-                      {/* Software Products - CapCut */}
-                      {product.category === 'software' && (product.id === 28 || product.id === 29 || product.id === 30) && (
-                        <img
-                          src="https://static.readdy.ai/image/498805ced0a624268fdcefbf8368cbd9/0a9282b6d6e94800abba3307d6371f07.png"
-                          alt="CapCut Logo"
-                          className="w-full h-full object-contain p-4"
-                        />
-                      )}
-
-                      {/* Netflix Products */}
-                      {product.category === 'netflix' && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=Netflix%20streaming%20service%20red%20logo%20movie%20entertainment%20platform%20modern%20design%20clean%20minimalist%20background%20professional%20digital%20video%20streaming&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {/* AI Tools */}
-                      {product.category === 'ai' && product.id === 31 && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=ChatGPT%20Plus%20artificial%20intelligence%20premium%20AI%20chatbot%20logo%20modern%20design%20clean%20minimalist%20background%20professional%20technology%20digital%20assistant&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {product.category === 'ai' && product.id === 32 && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=ChatGPT%20Plus%20artificial%20intelligence%20premium%20AI%20chatbot%20logo%20modern%20design%20clean%20minimalist%20background%20professional%20technology%20digital%20assistant&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {product.category === 'ai' && (product.id === 33 || product.id === 34) && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=Kling%20AI%20video%20generation%20artificial%20intelligence%20logo%20modern%20design%20clean%20minimalist%20background%20professional%20technology%20digital%20creation%20tool&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {product.category === 'ai' && (product.id === 35 || product.id === 36) && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=Leonardo%20AI%20art%20generation%20artificial%20intelligence%20creative%20tool%20logo%20modern%20design%20clean%20minimalist%20background%20professional%20digital%20art%20creation&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {product.category === 'ai' && product.id === 41 && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=VEO%20AI%20video%20generation%20artificial%20intelligence%20logo%20modern%20design%20clean%20minimalist%20background%20professional%20technology%20digital%20video%20creation%20tool&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {product.category === 'ai' && product.id === 43 && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=Grok%20AI%20premium%20artificial%20intelligence%20chatbot%20logo%20modern%20design%20clean%20minimalist%20background%20professional%20technology%20digital%20assistant&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {/* Microsoft Products */}
-                      {product.category === 'microsoft' && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=Microsoft%20Office%20365%20logo%20productivity%20suite%20blue%20modern%20design%20clean%20minimalist%20background%20professional%20business%20software%20applications&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {/* Twitter Products */}
-                      {product.category === 'twitter' && (
-                        <img
-                          src={`https://readdy.ai/api/search-image?query=Twitter%20X%20social%20media%20platform%20bird%20logo%20modern%20design%20clean%20minimalist%20background%20professional%20digital%20communication%20social%20network&width=200&height=200&seq=${product.id}&orientation=squarish`}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-
-                      {/* Default fallback for categories without specific images */}
-                      {![ 'tiktok', 'facebook', 'instagram', 'youtube', 'telegram', 'shopee', 'premium', 'design', 'software', 'netflix', 'ai', 'microsoft', 'twitter' ].includes(product.category) && (
-                        <div
-                          className={`w-20 h-20 rounded-full flex items-center justify-center bg-gray-100`}
-                        >
-                          <i className="text-3xl ri-apps-line text-gray-600"></i>
+                      ) : (
+                        <div className={productImage.containerClassName}>
+                          <i className={`text-3xl ${productImage.iconClassName}`}></i>
                         </div>
                       )}
                     </div>
                     {product.discount > 0 && (
-                      <div className="absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1">
+                      <div className="absolute right-3 top-3 z-10 rounded-full bg-rose-500 px-2.5 py-1 text-[11px] font-semibold text-white shadow-lg">
                         -{product.discount}%
                       </div>
                     )}
+                    <div className="absolute inset-x-3 bottom-3 z-10 flex items-center justify-between rounded-2xl bg-slate-950/70 px-3 py-2 text-[11px] text-white backdrop-blur">
+                      <span className="flex items-center gap-1.5 text-slate-100">
+                        <i className="ri-time-line"></i>
+                        {product.speed}
+                      </span>
+                      <span className={`rounded-full px-2 py-1 font-medium ${
+                        product.quality === 'Cao'
+                          ? 'bg-emerald-400/20 text-emerald-200'
+                          : 'bg-amber-300/20 text-amber-100'
+                      }`}>
+                        {product.quality}
+                      </span>
+                    </div>
                   </div>
 
-                  <div className="p-3">
-                    <h3 className="text-sm text-gray-800 mb-2 line-clamp-2 min-h-[2.5rem]">
+                  <div className="space-y-3 p-4">
+                    <h3 className="min-h-[2.8rem] text-sm font-semibold leading-5 text-slate-800 line-clamp-2">
                       {product.name}
                     </h3>
 
-                    <div className="flex items-center space-x-2 mb-2">
-                      <span className="text-purple-600 font-medium text-base">
-                        {typeof product.price === 'number' && product.price >= 1000
-                          ? `${product.price.toLocaleString()}đ`
-                          : `${product.price}đ`}
-                      </span>
-                      {product.discount > 0 && (
-                        <span className="text-gray-400 line-through text-xs">
-                          {typeof product.originalPrice === 'number' && product.originalPrice >= 1000
-                            ? `${product.originalPrice.toLocaleString()}đ`
-                            : `${product.originalPrice}đ`}
+                    <div className="flex items-end justify-between gap-2">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-base font-bold text-violet-600">
+                          {typeof product.price === 'number' && product.price >= 1000
+                            ? `${product.price.toLocaleString()}đ`
+                            : `${product.price}đ`}
                         </span>
-                      )}
+                        {product.discount > 0 && (
+                          <span className="text-xs text-slate-400 line-through">
+                            {typeof product.originalPrice === 'number' && product.originalPrice >= 1000
+                              ? `${product.originalPrice.toLocaleString()}đ`
+                              : `${product.originalPrice}đ`}
+                          </span>
+                        )}
+                      </div>
+                      <span className="rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-600">
+                        Từ {product.minOrder.toLocaleString()}
+                      </span>
                     </div>
 
-                    <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
-                      <span className="flex items-center">
-                        <i className="ri-time-line mr-1"></i>
-                        {product.speed}
-                      </span>
-                      <span
-                        className={`px-2 py-0.5 rounded-full ${
-                          product.quality === 'Cao' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'
-                        }`}
-                      >
-                        {product.quality}
-                      </span>
+                    <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-500">
+                      <div className="rounded-2xl bg-slate-50 px-3 py-2">
+                        <p className="mb-1 text-slate-400">Tối thiểu</p>
+                        <p className="font-semibold text-slate-700">{product.minOrder.toLocaleString()}</p>
+                      </div>
+                      <div className="rounded-2xl bg-slate-50 px-3 py-2">
+                        <p className="mb-1 text-slate-400">Tối đa</p>
+                        <p className="font-semibold text-slate-700">{product.maxOrder.toLocaleString()}</p>
+                      </div>
                     </div>
 
                     <Link
                       href={`/product/${product.id}`}
-                      className="block w-full bg-gradient-to-r from-purple-500 to-blue-500 text-white text-center py-2 rounded-sm text-sm hover:from-purple-600 hover:to-blue-600 transition-colors"
+                      className="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 py-2.5 text-sm font-medium text-white transition-all hover:bg-violet-600"
                     >
-                      Xem chi tiết
+                      <span>Xem chi tiết</span>
+                      <i className="ri-arrow-right-up-line"></i>
                     </Link>
                   </div>
-                </div>
-              ))}
+                </div>;
+              })}
             </div>
 
             {sortedProducts.length === 0 && (
@@ -1455,6 +1357,36 @@ export default function Home() {
       )}
 
       <div className="h-4 sm:h-6 lg:hidden"></div>
+      <style jsx>{`
+        .hero-grid {
+          background-image: linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+          background-size: 36px 36px;
+          mask-image: radial-gradient(circle at center, black 35%, transparent 85%);
+        }
+
+        .hero-orb {
+          animation: floatOrb 8s ease-in-out infinite;
+        }
+
+        .hero-orb-delayed {
+          animation: floatOrb 10s ease-in-out infinite 1.5s;
+        }
+
+        .hero-orb-slow {
+          animation: floatOrb 12s ease-in-out infinite 0.5s;
+        }
+
+        @keyframes floatOrb {
+          0%,
+          100% {
+            transform: translate3d(0, 0, 0) scale(1);
+          }
+          50% {
+            transform: translate3d(0, -18px, 0) scale(1.06);
+          }
+        }
+      `}</style>
     </div>
   );
 }

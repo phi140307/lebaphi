@@ -1,0 +1,14 @@
+<svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="800" rx="64" fill="#071427"/>
+  <circle cx="150" cy="246" r="18" fill="#F9AB00"/>
+  <circle cx="192" cy="220" r="16" fill="#EA4335"/>
+  <circle cx="192" cy="272" r="16" fill="#34A853"/>
+  <circle cx="234" cy="194" r="14" fill="#4285F4"/>
+  <circle cx="234" cy="246" r="14" fill="#F9AB00"/>
+  <circle cx="234" cy="298" r="14" fill="#EA4335"/>
+  <circle cx="276" cy="220" r="12" fill="#34A853"/>
+  <circle cx="276" cy="272" r="12" fill="#4285F4"/>
+  <text x="510" y="292" fill="#F5F7FB" font-size="96" font-family="Arial, Helvetica, sans-serif" font-weight="700" text-anchor="middle">Google AI</text>
+  <text x="400" y="430" fill="#54BFFF" font-size="136" font-family="Arial, Helvetica, sans-serif" font-weight="700" text-anchor="middle">Veo 3</text>
+  <path d="M0 646C110 612 220 614 330 646C440 678 550 680 660 648C712 633 758 630 800 636V800H0V646Z" fill="#0A2A59" opacity="0.85"/>
+</svg>

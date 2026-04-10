@@ -1,0 +1,6 @@
+<svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="800" rx="64" fill="#F4F4F4"/>
+  <path d="M182 186C248 186 300 238 300 304V496C300 562 248 614 182 614C116 614 64 562 64 496V304C64 238 116 186 182 186ZM182 266C160 266 142 284 142 306V494C142 516 160 534 182 534C204 534 222 516 222 494V306C222 284 204 266 182 266Z" fill="#090909"/>
+  <path d="M302 136L196 664H274L380 136H302Z" fill="#090909"/>
+  <text x="535" y="432" fill="#090909" font-size="154" font-family="Arial, Helvetica, sans-serif" font-weight="500" text-anchor="middle">Grok</text>
+</svg>

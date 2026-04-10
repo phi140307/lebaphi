@@ -1,0 +1,7 @@
+<svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="800" rx="64" fill="#15A56B"/>
+  <circle cx="400" cy="320" r="150" fill="white"/>
+  <path d="M474 308H398C366 308 340 334 340 366C340 398 366 424 398 424H452V376H398C392 376 388 372 388 366C388 360 392 356 398 356H474V308Z" fill="#15A56B"/>
+  <path d="M496 254C470 232 436 220 400 220C322 220 260 282 260 360C260 438 322 500 400 500C478 500 540 438 540 360V344H492V360C492 412 452 452 400 452C348 452 308 412 308 360C308 308 348 268 400 268C424 268 446 276 463 290L496 254Z" fill="#15A56B"/>
+  <text x="400" y="628" fill="white" font-size="102" font-family="Arial, Helvetica, sans-serif" font-weight="700" text-anchor="middle">Grammarly Premium</text>
+</svg>

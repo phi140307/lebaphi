@@ -1,0 +1,6 @@
+<svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="800" rx="64" fill="#F5F5F5"/>
+  <path d="M140 252H310L406 344L658 140V240L534 344L658 448V548L406 344L310 436H140L278 344L140 252Z" fill="#050505"/>
+  <path d="M140 548H310L406 456L658 660V560L534 456L658 352V252L406 456L310 548H140Z" fill="#050505"/>
+  <text x="510" y="438" fill="#050505" font-size="138" font-family="Arial, Helvetica, sans-serif" font-weight="500" text-anchor="middle">CapCut</text>
+</svg>

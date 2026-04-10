@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { cartManager } from '../../../../lib/cart';
+import { getProductImage } from '../../../../lib/product-images';
 
 const allProducts = [
   // TikTok Products
@@ -1034,6 +1035,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const currentServer = product.servers?.find(s => s.id === selectedServer);
   const currentPrice = currentServer ? currentServer.price : product.price;
   const totalPrice = quantity * currentPrice;
+  const productImage = getProductImage(product, 240);
 
   const handleAddToCart = () => {
     if (!targetUrl.trim()) {
@@ -1351,37 +1353,15 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                     <div className="space-y-4">
                       {/* Product Image */}
                       <div className="bg-gray-50 rounded-lg p-4 text-center">
-                        {/* TikTok Products - Sử dụng hình ảnh mới */}
-                        {product.category === 'tiktok' && (
+                        {productImage.type === 'image' ? (
                           <img
-                            src="https://static.readdy.ai/image/498805ced0a624268fdcefbf8368cbd9/74dc4a4dce6861ebcc79aa07c1ab0b14.png"
-                            alt={product.name}
-                            className="w-24 h-24 mx-auto object-contain"
+                            src={productImage.src}
+                            alt={productImage.alt}
+                            className={`mx-auto h-24 w-24 ${productImage.fit === 'cover' ? 'rounded-2xl object-cover' : 'object-contain'}`}
                           />
-                        )}
-
-                        {/* CapCut Products */}
-                        {product.category === 'software' && (product.id === 28 || product.id === 29 || product.id === 30) && (
-                          <img
-                            src="https://static.readdy.ai/image/498805ced0a624268fdcefbf8368cbd9/0a9282b6d6e94800abba3307d6371f07.png"
-                            alt={product.name}
-                            className="w-24 h-24 mx-auto object-contain"
-                          />
-                        )}
-
-                        {/* Canva Products */}
-                        {product.category === 'design' && (product.id === 23 || product.id === 24) && (
-                          <img
-                            src="https://static.readdy.ai/image/498805ced0a624268fdcefbf8368cbd9/d85a64c4610bb2bdbb8d01a2e3cc28ab.png"
-                            alt={product.name}
-                            className="w-24 h-24 mx-auto object-contain"
-                          />
-                        )}
-
-                        {/* Fallback for other categories */}
-                        {!(['tiktok', 'software', 'design'].includes(product.category) || ![28, 29, 30, 23, 24].includes(product.id)) && (
+                        ) : (
                           <div className="w-24 h-24 mx-auto bg-gray-200 rounded-full flex items-center justify-center">
-                            <i className={`ri-${product.category === 'facebook' ? 'facebook-fill' : product.category === 'instagram' ? 'instagram' : product.category === 'youtube' ? 'youtube' : 'apps'}-line text-3xl text-gray-500`}></i>
+                            <i className={`text-3xl ${productImage.iconClassName}`}></i>
                           </div>
                         )}
 

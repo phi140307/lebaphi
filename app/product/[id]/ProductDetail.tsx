@@ -5,6 +5,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { cartManager } from '../../../lib/cart';
 import { useRouter } from 'next/navigation';
+import { getProductImage } from '../../../lib/product-images';
 
 const products = [
   // TikTok Products
@@ -948,13 +949,241 @@ const products = [
   }
 ];
 
+const fallbackProducts = [
+  {
+    id: 45,
+    name: 'CapCut Pro Full Acc (1 năm)',
+    category: 'design',
+    price: 560000,
+    originalPrice: 800000,
+    minOrder: 1,
+    maxOrder: 3,
+    speed: '0-4 giờ',
+    quality: 'Cao',
+    description: 'Giao toàn quyền (Full acc) CapCut Pro trong 1 năm.',
+    status: 'active',
+    discount: 30,
+    features: ['CapCut Pro full acc', 'Sử dụng 1 năm', 'Bàn giao tài khoản đầy đủ', 'Ổn định', 'Hỗ trợ nhanh']
+  },
+  {
+    id: 46,
+    name: 'Adobe (6 tháng)',
+    category: 'design',
+    price: 350000,
+    originalPrice: 500000,
+    minOrder: 1,
+    maxOrder: 5,
+    speed: '0-6 giờ',
+    quality: 'Cao',
+    description: 'Tài khoản ứng dụng Adobe thời hạn 6 tháng.',
+    status: 'active',
+    discount: 30,
+    features: ['Adobe bản quyền', 'Thời hạn 6 tháng', 'Dùng ổn định', 'Phù hợp thiết kế', 'Hỗ trợ khi kích hoạt']
+  },
+  {
+    id: 47,
+    name: 'Meitu VIP (1 tháng)',
+    category: 'design',
+    price: 125000,
+    originalPrice: 180000,
+    minOrder: 1,
+    maxOrder: 10,
+    speed: '0-2 giờ',
+    quality: 'Cao',
+    description: 'Nâng cấp Meitu VIP sử dụng full tính năng trong 1 tháng.',
+    status: 'active',
+    discount: 30,
+    features: ['Meitu VIP', 'Thời hạn 1 tháng', 'Mở khóa tính năng cao cấp', 'Xử lý nhanh', 'Hỗ trợ 24/7']
+  },
+  {
+    id: 48,
+    name: 'YouTube Premium (1 tháng)',
+    category: 'entertainment',
+    price: 40000,
+    originalPrice: 60000,
+    minOrder: 1,
+    maxOrder: 10,
+    speed: '0-1 giờ',
+    quality: 'Cao',
+    description: 'Nâng cấp YouTube Premium không quảng cáo 1 tháng.',
+    status: 'active',
+    discount: 33,
+    features: ['YouTube Premium', 'Không quảng cáo', 'Thời hạn 1 tháng', 'Nghe nền', 'Hỗ trợ nhanh']
+  },
+  {
+    id: 49,
+    name: 'YouTube Premium (6 tháng)',
+    category: 'entertainment',
+    price: 210000,
+    originalPrice: 300000,
+    minOrder: 1,
+    maxOrder: 10,
+    speed: '0-2 giờ',
+    quality: 'Cao',
+    description: 'Nâng cấp YouTube Premium không quảng cáo 6 tháng.',
+    status: 'active',
+    discount: 30,
+    features: ['YouTube Premium', 'Không quảng cáo', 'Thời hạn 6 tháng', 'Nghe nền', 'Tiết kiệm hơn gói lẻ']
+  },
+  {
+    id: 50,
+    name: 'YouTube Premium (12 tháng)',
+    category: 'entertainment',
+    price: 460000,
+    originalPrice: 650000,
+    minOrder: 1,
+    maxOrder: 5,
+    speed: '0-2 giờ',
+    quality: 'Cao',
+    description: 'Nâng cấp YouTube Premium không quảng cáo 12 tháng.',
+    status: 'active',
+    discount: 29,
+    features: ['YouTube Premium', 'Không quảng cáo', 'Thời hạn 12 tháng', 'Nghe nền', 'Gói dài hạn ổn định']
+  },
+  {
+    id: 51,
+    name: 'Netflix (1 tháng)',
+    category: 'entertainment',
+    price: 50000,
+    originalPrice: 75000,
+    minOrder: 1,
+    maxOrder: 10,
+    speed: '0-2 giờ',
+    quality: 'Cao',
+    description: 'Tài khoản Netflix 1 tháng (Giá dao động 50k - 125k tùy loại: Dùng chung / Riêng / Farm).',
+    status: 'active',
+    discount: 33,
+    features: ['Netflix 1 tháng', 'Xem phim ổn định', 'Có nhiều lựa chọn loại acc', 'Kích hoạt nhanh', 'Hỗ trợ khi lỗi']
+  },
+  {
+    id: 52,
+    name: 'Spotify Premium (6 tháng)',
+    category: 'entertainment',
+    price: 390000,
+    originalPrice: 550000,
+    minOrder: 1,
+    maxOrder: 10,
+    speed: '0-2 giờ',
+    quality: 'Cao',
+    description: 'Nâng cấp Spotify Premium chính chủ thời hạn 6 tháng.',
+    status: 'active',
+    discount: 29,
+    features: ['Spotify Premium', 'Thời hạn 6 tháng', 'Không quảng cáo', 'Nghe offline', 'Nâng cấp nhanh']
+  },
+  {
+    id: 53,
+    name: 'Spotify Premium (12 tháng)',
+    category: 'entertainment',
+    price: 540000,
+    originalPrice: 770000,
+    minOrder: 1,
+    maxOrder: 5,
+    speed: '0-2 giờ',
+    quality: 'Cao',
+    description: 'Nâng cấp Spotify Premium chính chủ thời hạn 12 tháng.',
+    status: 'active',
+    discount: 30,
+    features: ['Spotify Premium', 'Thời hạn 12 tháng', 'Không quảng cáo', 'Nghe offline', 'Ổn định dài hạn']
+  },
+  {
+    id: 54,
+    name: 'Microsoft Office 365 + 1TB (1 năm)',
+    category: 'microsoft',
+    price: 210000,
+    originalPrice: 300000,
+    minOrder: 1,
+    maxOrder: 10,
+    speed: '0-4 giờ',
+    quality: 'Cao',
+    description: 'Bộ công cụ Office 365 kèm 1TB OneDrive thời hạn 1 năm.',
+    status: 'active',
+    discount: 30,
+    features: ['Office 365 bản quyền', '1TB OneDrive', 'Thời hạn 1 năm', 'Dùng ổn định', 'Hỗ trợ kích hoạt']
+  },
+  {
+    id: 55,
+    name: 'Quizlet Plus (1 tháng)',
+    category: 'education',
+    price: 40000,
+    originalPrice: 60000,
+    minOrder: 1,
+    maxOrder: 10,
+    speed: '0-2 giờ',
+    quality: 'Cao',
+    description: 'Tài khoản học tập Quizlet Plus thời hạn 1 tháng.',
+    status: 'active',
+    discount: 33,
+    features: ['Quizlet Plus', 'Thời hạn 1 tháng', 'Hỗ trợ học tập', 'Kích hoạt nhanh', 'Ổn định']
+  },
+  {
+    id: 56,
+    name: 'Quizlet Plus (12 tháng)',
+    category: 'education',
+    price: 210000,
+    originalPrice: 300000,
+    minOrder: 1,
+    maxOrder: 5,
+    speed: '0-2 giờ',
+    quality: 'Cao',
+    description: 'Tài khoản học tập Quizlet Plus thời hạn 12 tháng.',
+    status: 'active',
+    discount: 30,
+    features: ['Quizlet Plus', 'Thời hạn 12 tháng', 'Hỗ trợ học tập', 'Dùng ổn định', 'Tiết kiệm hơn gói lẻ']
+  },
+  {
+    id: 57,
+    name: 'Duolingo Super (12 tháng)',
+    category: 'education',
+    price: 390000,
+    originalPrice: 550000,
+    minOrder: 1,
+    maxOrder: 5,
+    speed: '0-2 giờ',
+    quality: 'Cao',
+    description: 'Nâng cấp học ngoại ngữ Duolingo Super thời hạn 1 năm.',
+    status: 'active',
+    discount: 29,
+    features: ['Duolingo Super', 'Thời hạn 12 tháng', 'Học ngoại ngữ không giới hạn', 'Nâng cấp nhanh', 'Hỗ trợ khi lỗi']
+  },
+  {
+    id: 58,
+    name: 'Grammarly Premium (1 tháng)',
+    category: 'education',
+    price: 210000,
+    originalPrice: 300000,
+    minOrder: 1,
+    maxOrder: 10,
+    speed: '0-2 giờ',
+    quality: 'Cao',
+    description: 'Công cụ sửa lỗi ngữ pháp tiếng Anh Grammarly Premium 1 tháng.',
+    status: 'active',
+    discount: 30,
+    features: ['Grammarly Premium', 'Thời hạn 1 tháng', 'Kiểm tra ngữ pháp', 'Hỗ trợ viết tiếng Anh', 'Ổn định']
+  },
+  {
+    id: 59,
+    name: 'Locket Gold (Vĩnh viễn)',
+    category: 'premium',
+    price: 65000,
+    originalPrice: 100000,
+    minOrder: 1,
+    maxOrder: 10,
+    speed: '0-2 giờ',
+    quality: 'Cao',
+    description: 'Locket Gold dùng vĩnh viễn (Bảo hành 1 năm).',
+    status: 'active',
+    discount: 35,
+    features: ['Locket Gold', 'Dùng vinh vien', 'Bao hanh 1 nam', 'Kich hoat nhanh', 'Ho tro khi loi']
+  }
+];
+
 interface ProductDetailProps {
   productId: string;
 }
 
 export default function ProductDetail({ productId }: ProductDetailProps) {
   const productIdNum = parseInt(productId);
-  const product = products.find((p) => p.id === productIdNum);
+  const product = products.find((p) => p.id === productIdNum) || fallbackProducts.find((p) => p.id === productIdNum);
   const router = useRouter();
 
   const [quantity, setQuantity] = useState(product?.minOrder || 100);
@@ -977,6 +1206,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   }
 
   const totalPrice = quantity * product.price;
+  const productImage = getProductImage(product, 400);
 
   const handleAddToCart = () => {
     if (!targetUrl.trim()) {
@@ -1072,163 +1302,14 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Product Images */}
-            <div className="bg-white rounded shadow-sm">
-              <div className="aspect-square bg-gray-100 flex items-center justify-center relative">
-                {product.category === 'design' && (product.id === 23 || product.id === 24) ? (
+            <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-200/70">
+              <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/10 via-transparent to-white/40"></div>
+                {productImage.type === 'image' ? (
                   <img
-                    src="https://static.readdy.ai/image/498805ced0a624268fdcefbf8368cbd9/d85a64c4610bb2bdbb8d01a2e3cc28ab.png"
-                    alt="Canva Logo"
-                    className="w-full h-full object-contain p-4"
-                  />
-                ) : product.category === 'software' && (product.id === 28 || product.id === 29 || product.id === 30) ? (
-                  <img
-                    src="https://static.readdy.ai/image/498805ced0a624268fdcefbf8368cbd9/0a9282b6d6e94800abba3307d6371f07.png"
-                    alt="CapCut Logo"
-                    className="w-full h-full object-contain p-4"
-                  />
-                ) : product.category === 'ai' && (product.id === 31 || product.id === 32) ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=ChatGPT%20artificial%20intelligence%20premium%20AI%20chatbot%20logo%20modern%20design%20clean%20minimalist%20background%20professional%20technology%20digital%20assistant%20OpenAI&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt="ChatGPT AI"
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'ai' && (product.id === 33 || product.id === 34) ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=Kling%20AI%20video%20generation%20artificial%20intelligence%20logo%20modern%20design%20clean%20minimalist%20background%20professional%20technology%20digital%20creation%20tool&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt="Kling AI"
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'ai' && (product.id === 35 || product.id === 36) ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=Leonardo%20AI%20art%20generation%20artificial%20intelligence%20creative%20tool%20logo%20modern%20design%20clean%20minimalist%20background%20professional%20digital%20art%20creation&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt="Leonardo AI"
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'ai' && product.id === 41 ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=VEO%20AI%20video%20generation%20artificial%20intelligence%20logo%20modern%20design%20clean%20minimalist%20background%20professional%20digital%20video%20creation%20tool&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt="VEO AI"
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'ai' && product.id === 43 ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=Grok%20AI%20premium%20artificial%20intelligence%20chatbot%20logo%20modern%20design%20clean%20minimalist%20background%20professional%20technology%20digital%20assistant&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt="Grok AI"
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'premium' && product.id === 22 ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=ChatGPT%20Plus%20artificial%20intelligence%20premium%20AI%20chatbot%20logo%20modern%20design%20clean%20minimalist%20background%20professional%20technology%20digital%20assistant%20OpenAI&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt="ChatGPT Plus"
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'premium' && (product.id === 25 || product.id === 26 || product.id === 27) ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=Spotify%20music%20streaming%20platform%20green%20logo%20premium%20service%20modern%20design%20clean%20minimalist%20background%20professional%20digital%20entertainment%20audio&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt="Spotify Premium"
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'premium' && product.id === 42 ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=Locket%20Gold%20premium%20app%20widget%20photo%20sharing%20modern%20design%20clean%20minimalist%20background%20professional%20mobile%20application%20golden%20premium%20service&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt="Locket Gold"
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'youtube' && product.id === 37 ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=YouTube%20Premium%20logo%20red%20play%20button%20premium%20service%20ad-free%20video%20streaming%20modern%20design%20clean%20minimalist%20background%20professional%20digital%20entertainment&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt="YouTube Premium"
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'netflix' && (product.id === 38 || product.id === 39 || product.id === 40) ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=Netflix%20streaming%20service%20red%20logo%20movie%20entertainment%20platform%20modern%20design%20clean%20minimalist%20background%20professional%20digital%20video%20streaming&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt="Netflix"
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'microsoft' && product.id === 44 ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=Microsoft%20Office%20365%20logo%20productivity%20suite%20blue%20modern%20design%20clean%20minimalist%20background%20professional%20business%20software%20applications&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt="Microsoft Office"
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'tiktok' ? (
-                  <img
-                    src="https://static.readdy.ai/image/498805ced0a624268fdcefbf8368cbd9/74dc4a4dce6861ebcc79aa07c1ab0b14.png"
-                    alt={product.name}
-                    className="w-full h-full object-contain p-4"
-                  />
-                ) : product.category === 'facebook' && product.id === 6 ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=Facebook%20like%20button%20thumbs%20up%20social%20media%20engagement%20blue%20icon%20modern%20design%20digital%20interaction%20social%20network%20clean%20minimalist%20background%20professional%20sleek%20interface%20user%20engagement&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'facebook' && product.id === 7 ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=Facebook%20page%20follow%20button%20social%20media%20fanpage%20business%20page%20digital%20marketing%20blue%20interface%20modern%20design%20clean%20minimalist%20background%20professional%20social%20network%20engagement&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'facebook' && product.id === 8 ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=Facebook%20share%20button%20social%20media%20viral%20content%20sharing%20blue%20interface%20modern%20design%20clean%20minimalist%20background%20professional%20social%20network%20digital%20engagement&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'instagram' && product.id === 9 ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=Instagram%20follow%20button%20pink%20gradient%20social%20media%20followers%20engagement%20modern%20design%20clean%20minimalist%20background%20professional%20social%20network%20interface%20user%20growth&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'instagram' && product.id === 10 ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=Instagram%20like%20heart%20button%20pink%20gradient%20social%20media%20engagement%20modern%20design%20clean%20minimalist%20background%20professional%20social%20network%20interface%20user%20interaction&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'instagram' && product.id === 11 ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=Instagram%20story%20views%20eye%20icon%20pink%20gradient%20social%20media%20engagement%20modern%20design%20clean%20minimalist%20background%20professional%20social%20network%20interface%20user%20interaction&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'youtube' && product.id === 12 ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=YouTube%20subscribe%20button%20red%20play%20button%20video%20platform%20modern%20design%20clean%20minimalist%20background%20professional%20digital%20content%20creator%20channel%20growth&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'youtube' && product.id === 13 ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=YouTube%20like%20thumbs%20up%20button%20red%20video%20platform%20engagement%20modern%20design%20clean%20minimalist%20background%20professional%20digital%20content%20interaction&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'youtube' && product.id === 14 ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=YouTube%20video%20views%20play%20button%20red%20counter%20statistics%20modern%20design%20clean%20minimalist%20background%20professional%20digital%20content%20analytics&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'telegram' ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=Telegram%20messaging%20app%20blue%20airplane%20logo%20modern%20design%20clean%20minimalist%20background%20professional%20digital%20communication%20social%20media%20platform&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'shopee' ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=Shopee%20online%20shopping%20platform%20orange%20logo%20e-commerce%20marketplace%20modern%20design%20clean%20minimalist%20background%20professional%20digital%20retail%20store&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : product.category === 'twitter' ? (
-                  <img
-                    src={`https://readdy.ai/api/search-image?query=Twitter%20X%20social%20media%20platform%20bird%20logo%20modern%20design%20clean%20minimalist%20background%20professional%20digital%20communication%20social%20network&width=400&height=400&seq=${product.id}&orientation=squarish`}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
+                    src={productImage.src}
+                    alt={productImage.alt}
+                    className={`h-full w-full ${productImage.fit === 'cover' ? 'object-cover' : 'object-contain p-5 sm:p-6'}`}
                   />
                 ) : (
                   <div className="relative w-full h-full flex items-center justify-center">
@@ -1259,15 +1340,18 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                   </div>
                 )}
                 {product.discount > 0 && (
-                  <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded">
+                  <div className="absolute left-4 top-4 rounded-full bg-rose-500 px-3 py-1 text-sm font-semibold text-white shadow-lg">
                     Giảm {product.discount}%
                   </div>
                 )}
+                <div className="absolute bottom-4 right-4 rounded-full border border-white/70 bg-white/90 px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm backdrop-blur">
+                  {product.category}
+                </div>
               </div>
             </div>
 
             {/* Product Info */}
-            <div className="bg-white rounded shadow-sm p-6">
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/70">
               <div className="mb-4">
                 <h1 className="text-2xl font-medium text-gray-900 mb-2">{product.name}</h1>
                 <div className="flex items-center space-x-4 text-sm text-gray-500">
@@ -1281,7 +1365,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
               </div>
 
               {/* Price */}
-              <div className="bg-gray-50 p-4 rounded mb-6">
+              <div className="mb-6 rounded-3xl border border-violet-100 bg-gradient-to-br from-violet-50 via-white to-blue-50 p-5">
                 <div className="flex items-center space-x-4">
                   {product.discount > 0 && (
                     <span className="text-gray-400 line-through text-lg">
@@ -1296,7 +1380,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                       : `₫${product.price}`}
                   </span>
                   {product.discount > 0 && (
-                    <span className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-2 py-1 rounded text-sm">
+                    <span className="rounded-full bg-gradient-to-r from-purple-500 to-blue-500 px-3 py-1 text-sm font-medium text-white shadow-sm">
                       -{product.discount}% GIẢM
                     </span>
                   )}
@@ -1304,23 +1388,23 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
               </div>
 
               {/* Product Details Grid */}
-              <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
-                <div className="flex justify-between">
+              <div className="mb-6 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+                <div className="flex justify-between rounded-2xl bg-slate-50 px-4 py-3">
                   <span className="text-gray-500">Số lượng tối thiểu:</span>
-                  <span className="text-gray-900">{product.minOrder.toLocaleString()}</span>
+                  <span className="font-semibold text-gray-900">{product.minOrder.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between rounded-2xl bg-slate-50 px-4 py-3">
                   <span className="text-gray-500">Số lượng tối đa:</span>
-                  <span className="text-gray-900">{product.maxOrder.toLocaleString()}</span>
+                  <span className="font-semibold text-gray-900">{product.maxOrder.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between rounded-2xl bg-slate-50 px-4 py-3">
                   <span className="text-gray-500">Tốc độ xử lý:</span>
-                  <span className="text-gray-900">{product.speed}</span>
+                  <span className="font-semibold text-gray-900">{product.speed}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between rounded-2xl bg-slate-50 px-4 py-3">
                   <span className="text-gray-500">Chất lượng:</span>
                   <span
-                    className={`${
+                    className={`font-semibold ${
                       product.quality === 'Cao' ? 'text-green-600' : 'text-yellow-600'
                     }`}
                   >
