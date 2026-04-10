@@ -51,34 +51,41 @@ export default function Register() {
     setMessage('');
 
     try {
-      const { data, error } = await registerUser({
+      console.log('Starting registration...');
+      const result = await registerUser({
         username: formData.username,
         email: formData.email,
         password: formData.password,
         full_name: formData.fullName
       });
 
-      if (error) {
-        if (error.message && error.message.includes('already exists')) {
-          setMessage('Tên đăng nhập hoặc email đã tồn tại');
+      console.log('Registration result:', result);
+
+      if (result.error) {
+        const errorMsg = result.error.message || '';
+        if (errorMsg.includes('already exists') || errorMsg.includes('already been taken')) {
+          setMessage('Email đã được sử dụng');
+        } else if (errorMsg.includes('Password')) {
+          setMessage('Mật khẩu không hợp lệ');
         } else {
-          setMessage('Có lỗi xảy ra khi đăng ký: ' + (error.message || 'Unknown error'));
+          setMessage('Lỗi đăng ký: ' + errorMsg);
         }
         setMessageType('error');
         setIsLoading(false);
         return;
       }
 
-      setMessage('Đăng ký thành công! Đang chuyển hướng đến trang đăng nhập...');
+      setMessage('Đăng ký thành công! Vui lòng kiểm tra email để xác nhận.');
       setMessageType('success');
       
       setTimeout(() => {
         router.push('/login');
         setIsLoading(false);
-      }, 2000);
+      }, 3000);
 
     } catch (err: any) {
-      setMessage('Có lỗi xảy ra khi đăng ký: ' + (err.message || 'Unknown error'));
+      console.error('Register catch error:', err);
+      setMessage('Lỗi: ' + (err.message || 'Unknown error'));
       setMessageType('error');
       setIsLoading(false);
     }

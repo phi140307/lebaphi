@@ -41,7 +41,12 @@ export const registerUser = async (userData: {
       }
     })
 
-    if (error) throw error
+    if (error) {
+      console.error('Auth signUp error:', error)
+      throw error
+    }
+
+    console.log('Auth user created:', data.user?.id)
 
     if (data.user) {
       const { error: profileError } = await supabase
@@ -60,12 +65,13 @@ export const registerUser = async (userData: {
         ])
 
       if (profileError) {
-        console.error('Profile creation error:', profileError)
+        console.error('Profile insert error:', profileError)
       }
     }
 
     return { data, error: null }
   } catch (error: any) {
+    console.error('Register error:', error.message || error)
     return { data: null, error }
   }
 }
@@ -192,10 +198,26 @@ export const createDepositTransaction = async (transactionData: {
   return { data, error }
 }
 
-export const loginUser = async (username: string, password: string) => {
+export const loginUser = async (identifier: string, password: string) => {
   try {
+    let email = identifier
+    
+    if (!identifier.includes('@')) {
+      const { data: userData } = await supabase
+        .from('users')
+        .select('email')
+        .eq('username', identifier)
+        .single()
+      
+      if (userData) {
+        email = userData.email
+      } else {
+        return { data: null, error: new Error('User not found') }
+      }
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: username.includes('@') ? username : `${username}@placeholder.com`,
+      email: email,
       password: password,
     })
 
@@ -223,6 +245,7 @@ export const loginUser = async (username: string, password: string) => {
 
     return { data: null, error: new Error('User not found') }
   } catch (error: any) {
+    console.error('Login error:', error)
     return { data: null, error }
   }
 }
