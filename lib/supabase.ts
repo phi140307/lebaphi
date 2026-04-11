@@ -25,6 +25,35 @@ export interface User {
   total_spent?: number
 }
 
+function isUsersTableMissingError(error: unknown) {
+  if (!error || typeof error !== 'object') {
+    return false
+  }
+
+  const code = 'code' in error ? String((error as { code?: string }).code || '') : ''
+  const message = 'message' in error ? String((error as { message?: string }).message || '') : ''
+
+  return code === 'PGRST205' || code === '42P01' || message.includes("public.users")
+}
+
+function mapAuthUserToProfile(user: any): User {
+  const metadata = user?.user_metadata || {}
+
+  return {
+    id: user.id,
+    username: metadata.username || user.email?.split('@')[0] || user.id,
+    email: user.email || '',
+    full_name: metadata.full_name || '',
+    created_at: user.created_at || new Date().toISOString(),
+    updated_at: user.updated_at || user.created_at || new Date().toISOString(),
+    status: 'active',
+    balance: 0,
+    total_deposited: 0,
+    total_spent: 0,
+    last_login: user.last_sign_in_at,
+  }
+}
+
 export const registerUser = async (userData: {
   username: string
   email: string
@@ -54,7 +83,7 @@ export const registerUser = async (userData: {
     }
 
     if (data.user) {
-      await supabase
+      const { error: profileError } = await supabase
         .from('users')
         .insert([
           {
@@ -68,6 +97,11 @@ export const registerUser = async (userData: {
             status: 'active'
           }
         ])
+
+      if (profileError && !isUsersTableMissingError(profileError)) {
+        console.error('Create profile error:', profileError)
+        return { data: null, error: profileError }
+      }
     }
 
     return { data, error: null }
@@ -208,18 +242,32 @@ export const createDepositTransaction = async (transactionData: {
 export const loginUser = async (identifier: string, password: string) => {
   try {
     let email = identifier
+    let usersTableAvailable = true
     
     if (!identifier.includes('@')) {
-      const { data: userData } = await supabase
+      const { data: userData, error: userLookupError } = await supabase
         .from('users')
         .select('email')
         .eq('username', identifier)
         .single()
+
+      if (userLookupError && isUsersTableMissingError(userLookupError)) {
+        usersTableAvailable = false
+      } else if (userLookupError) {
+        throw userLookupError
+      }
       
       if (userData) {
         email = userData.email
       } else {
-        return { data: null, error: new Error('User not found') }
+        return {
+          data: null,
+          error: new Error(
+            usersTableAvailable
+              ? 'User not found'
+              : 'Hệ thống hiện chỉ hỗ trợ đăng nhập bằng email.'
+          )
+        }
       }
     }
 
@@ -237,17 +285,21 @@ export const loginUser = async (identifier: string, password: string) => {
         .eq('id', data.user.id)
         .single()
 
-      if (userError) throw userError
+      if (userError && !isUsersTableMissingError(userError)) throw userError
 
-      await supabase
-        .from('users')
-        .update({
-          last_login: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', data.user.id)
+      if (!userError) {
+        await supabase
+          .from('users')
+          .update({
+            last_login: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', data.user.id)
 
-      return { data: userData, error: null }
+        return { data: userData, error: null }
+      }
+
+      return { data: mapAuthUserToProfile(data.user), error: null }
     }
 
     return { data: null, error: new Error('User not found') }

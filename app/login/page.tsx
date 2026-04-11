@@ -50,7 +50,7 @@ export default function Login() {
       const { data, error } = await loginUser(username, password);
 
       if (error || !data) {
-        setMessage('Tên đăng nhập hoặc mật khẩu không chính xác');
+        setMessage(error?.message || 'Tên đăng nhập hoặc mật khẩu không chính xác');
         setMessageType('error');
         setIsLoading(false);
         return;
