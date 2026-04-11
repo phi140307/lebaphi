@@ -5,8 +5,9 @@ import Link from 'next/link';
 import { cartManager } from '../../../../lib/cart';
 import { useParams } from 'next/navigation';
 import { getProductImage } from '../../../../lib/product-images';
+import { getProductFeatures, getPublicProductById } from '../../../../lib/public-products';
 
-const allProducts = [
+const legacyProducts = [
   // TikTok Products
   {
     id: 1,
@@ -985,7 +986,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const params = useParams<{ id: string }>();
   const resolvedProductId = productId || params?.id || '';
   const productIdNum = parseInt(resolvedProductId, 10);
-  const product = allProducts.find(p => p.id === productIdNum);
+  const product = getPublicProductById(productIdNum);
 
   const [selectedServer, setSelectedServer] = useState('');
   const [quantity, setQuantity] = useState(product?.minOrder || 100);
@@ -1035,10 +1036,11 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     );
   }
 
-  const currentServer = product.servers?.find(s => s.id === selectedServer);
+  const currentServer = product.servers?.find((s) => s.id === selectedServer);
   const currentPrice = currentServer ? currentServer.price : product.price;
   const totalPrice = quantity * currentPrice;
   const productImage = getProductImage(product, 240);
+  const productFeatures = getProductFeatures(product);
 
   const handleAddToCart = () => {
     if (!targetUrl.trim()) {
@@ -1373,11 +1375,11 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                       </div>
 
                       {/* Features */}
-                      {product.features && (
+                      {productFeatures.length > 0 && (
                         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                           <h3 className="font-semibold text-green-900 mb-3">Tính năng:</h3>
                           <ul className="text-sm text-green-800 space-y-1">
-                            {product.features.map((feature, index) => (
+                            {productFeatures.map((feature, index) => (
                               <li key={index} className="flex items-start">
                                 <i className="ri-check-line mr-2 mt-0.5 text-green-600"></i>
                                 {feature}

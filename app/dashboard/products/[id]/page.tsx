@@ -1,12 +1,13 @@
 
+import { publicProducts } from '../../../../lib/public-products';
 import ProductDetail from './ProductDetail';
 
 export async function generateStaticParams() {
-  return Array.from({ length: 59 }, (_, index) => ({ id: String(index + 1) }));
+  return publicProducts.map((product) => ({ id: String(product.id) }));
 }
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  return <ProductDetail productId={id} />;
+  return <ProductDetail key={id} productId={id} />;
 }

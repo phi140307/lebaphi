@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getUserById } from '../../../lib/supabase';
 import { getProductImage } from '../../../lib/product-images';
+import { publicProducts } from '../../../lib/public-products';
 
 export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -121,7 +122,7 @@ setCurrentUser(demoUser as any);
     { id: 'microsoft', name: 'Microsoft', icon: 'ri-microsoft-line' },
   ];
 
-  const products = [
+  const legacyProducts = [
     {
       id: 1,
       name: 'Like TikTok Việt Nam',
@@ -747,7 +748,7 @@ setCurrentUser(demoUser as any);
     },
   ];
 
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = publicProducts.filter(product => {
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          product.description.toLowerCase().includes(searchTerm.toLowerCase());

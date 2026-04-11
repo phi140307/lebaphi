@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getProductImage } from '../lib/product-images';
+import { publicProducts } from '../lib/public-products';
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -29,7 +30,7 @@ export default function Home() {
     { id: 'microsoft', name: 'Microsoft', icon: 'ri-microsoft-line' },
   ];
 
-  const products = [
+  const legacyProducts = [
     {
       id: 1,
       name: 'Like TikTok Việt Nam',
@@ -864,7 +865,7 @@ export default function Home() {
     }
   ];
 
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = publicProducts.filter(product => {
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     const matchesSearch =
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

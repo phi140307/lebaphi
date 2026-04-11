@@ -1,13 +1,14 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { cartManager } from '../../../lib/cart';
 import { useParams, useRouter } from 'next/navigation';
 import { getProductImage } from '../../../lib/product-images';
+import { getProductFeatures, getPublicProductById } from '../../../lib/public-products';
 
-const products = [
+const legacyProducts = [
   // TikTok Products
   {
     id: 1,
@@ -949,7 +950,7 @@ const products = [
   }
 ];
 
-const fallbackProducts = [
+const legacyFallbackProducts = [
   {
     id: 45,
     name: 'CapCut Pro Full Acc (1 năm)',
@@ -1185,7 +1186,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const params = useParams<{ id: string }>();
   const resolvedProductId = productId || params?.id || '';
   const productIdNum = parseInt(resolvedProductId, 10);
-  const product = products.find((p) => p.id === productIdNum) || fallbackProducts.find((p) => p.id === productIdNum);
+  const product = getPublicProductById(productIdNum);
   const router = useRouter();
 
   const [quantity, setQuantity] = useState(product?.minOrder || 100);
@@ -1193,6 +1194,18 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const [notes, setNotes] = useState('');
   const [isAdding, setIsAdding] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+
+  useEffect(() => {
+    if (!product) {
+      return;
+    }
+
+    setQuantity(product.minOrder);
+    setTargetUrl('');
+    setNotes('');
+    setIsAdding(false);
+    setShowLoginModal(false);
+  }, [product]);
 
   if (!product) {
     return (
@@ -1209,6 +1222,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
 
   const totalPrice = quantity * product.price;
   const productImage = getProductImage(product, 400);
+  const productFeatures = getProductFeatures(product);
 
   const handleAddToCart = () => {
     if (!targetUrl.trim()) {
@@ -1528,7 +1542,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
 
               <h4 className="font-medium text-gray-900 mb-3">Tính năng nổi bật:</h4>
               <ul className="space-y-2">
-                {product.features.map((feature, index) => (
+                {productFeatures.map((feature, index) => (
                   <li key={index} className="flex items-start space-x-2">
                     <i className="ri-check-line text-green-600 mt-0.5 flex-shrink-0"></i>
                     <span className="text-gray-600">{feature}</span>
