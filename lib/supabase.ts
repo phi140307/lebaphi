@@ -1,11 +1,22 @@
 
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://minygyshbmfhzaolrhzh.supabase.co'
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pbnlneXNoYm1maHphb2xyaHpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MDYxMjEsImV4cCI6MjA5MTM4MjEyMX0.DfFvkK3yiL174fUryZfSQTHcT9LcmMfmI3IrEb0bA-k'
+const DEFAULT_SUPABASE_URL = 'https://minygyshbmfhzaolrhzh.supabase.co'
+const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pbnlneXNoYm1maHphb2xyaHpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MDYxMjEsImV4cCI6MjA5MTM4MjEyMX0.DfFvkK3yiL174fUryZfSQTHcT9LcmMfmI3IrEb0bA-k'
 
-console.log('Supabase URL:', supabaseUrl)
-console.log('Supabase Key loaded:', supabaseAnonKey ? 'YES' : 'NO')
+function sanitizeEnvValue(value?: string) {
+  return value?.trim().replace(/^['\"]|['\"]$/g, '') || ''
+}
+
+function looksLikeSupabaseJwt(value: string) {
+  return value.split('.').length === 3
+}
+
+const envSupabaseUrl = sanitizeEnvValue(process.env.NEXT_PUBLIC_SUPABASE_URL)
+const envSupabaseAnonKey = sanitizeEnvValue(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+
+const supabaseUrl = envSupabaseUrl.startsWith('https://') ? envSupabaseUrl : DEFAULT_SUPABASE_URL
+const supabaseAnonKey = looksLikeSupabaseJwt(envSupabaseAnonKey) ? envSupabaseAnonKey : DEFAULT_SUPABASE_ANON_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
@@ -54,6 +65,49 @@ function mapAuthUserToProfile(user: any): User {
   }
 }
 
+function buildUserProfilePayload(user: any, overrides?: {
+  username?: string
+  email?: string
+  full_name?: string
+  phone?: string
+}) {
+  const metadata = user?.user_metadata || {}
+
+  return {
+    id: user.id,
+    username: overrides?.username || metadata.username || user.email?.split('@')[0] || user.id,
+    email: overrides?.email || user.email || '',
+    full_name: overrides?.full_name ?? metadata.full_name ?? '',
+    phone: overrides?.phone ?? metadata.phone ?? null,
+    balance: 0,
+    total_deposited: 0,
+    total_spent: 0,
+    status: 'active' as const,
+    last_login: user.last_sign_in_at || null,
+    updated_at: new Date().toISOString(),
+  }
+}
+
+async function ensureUserProfile(
+  user: any,
+  overrides?: {
+    username?: string
+    email?: string
+    full_name?: string
+    phone?: string
+  }
+) {
+  const payload = buildUserProfilePayload(user, overrides)
+
+  const { data, error } = await supabase
+    .from('users')
+    .upsert(payload, { onConflict: 'id' })
+    .select()
+    .single()
+
+  return { data, error }
+}
+
 export const registerUser = async (userData: {
   username: string
   email: string
@@ -62,13 +116,22 @@ export const registerUser = async (userData: {
   phone?: string
 }) => {
   try {
-    const { data, error } = await supabase.auth.signUp({
-      email: userData.email,
+    const normalizedUserData = {
+      username: userData.username.trim(),
+      email: userData.email.trim().toLowerCase(),
       password: userData.password,
+      full_name: userData.full_name?.trim(),
+      phone: userData.phone?.trim(),
+    }
+
+    const { data, error } = await supabase.auth.signUp({
+      email: normalizedUserData.email,
+      password: normalizedUserData.password,
       options: {
         data: {
-          username: userData.username,
-          full_name: userData.full_name,
+          username: normalizedUserData.username,
+          full_name: normalizedUserData.full_name,
+          phone: normalizedUserData.phone,
         }
       }
     })
@@ -83,24 +146,13 @@ export const registerUser = async (userData: {
     }
 
     if (data.user) {
-      const { error: profileError } = await supabase
-        .from('users')
-        .insert([
-          {
-            id: data.user.id,
-            username: userData.username,
-            email: userData.email,
-            full_name: userData.full_name,
-            balance: 0,
-            total_deposited: 0,
-            total_spent: 0,
-            status: 'active'
-          }
-        ])
+      const { error: profileError } = await ensureUserProfile(data.user, normalizedUserData)
 
+      // When email confirmation is enabled, signUp often returns no session yet.
+      // In that case an authenticated insert into public.users can fail due to RLS,
+      // but the auth account has still been created successfully.
       if (profileError && !isUsersTableMissingError(profileError)) {
-        console.error('Create profile error:', profileError)
-        return { data: null, error: profileError }
+        console.warn('Create profile skipped after signUp:', profileError)
       }
     }
 
@@ -241,14 +293,14 @@ export const createDepositTransaction = async (transactionData: {
 
 export const loginUser = async (identifier: string, password: string) => {
   try {
-    let email = identifier
+    let email = identifier.trim().toLowerCase()
     let usersTableAvailable = true
     
     if (!identifier.includes('@')) {
       const { data: userData, error: userLookupError } = await supabase
         .from('users')
         .select('email')
-        .eq('username', identifier)
+        .eq('username', identifier.trim())
         .single()
 
       if (userLookupError && isUsersTableMissingError(userLookupError)) {
@@ -283,11 +335,11 @@ export const loginUser = async (identifier: string, password: string) => {
         .from('users')
         .select('*')
         .eq('id', data.user.id)
-        .single()
+        .maybeSingle()
 
       if (userError && !isUsersTableMissingError(userError)) throw userError
 
-      if (!userError) {
+      if (userData) {
         await supabase
           .from('users')
           .update({
@@ -297,6 +349,23 @@ export const loginUser = async (identifier: string, password: string) => {
           .eq('id', data.user.id)
 
         return { data: userData, error: null }
+      }
+
+      if (!userError) {
+        const fallbackProfile = mapAuthUserToProfile(data.user)
+        const { data: createdProfile, error: createProfileError } = await ensureUserProfile(data.user, {
+          username: fallbackProfile.username,
+          email: fallbackProfile.email,
+          full_name: fallbackProfile.full_name,
+        })
+
+        if (!createProfileError && createdProfile) {
+          return { data: createdProfile, error: null }
+        }
+
+        if (createProfileError && !isUsersTableMissingError(createProfileError)) {
+          console.warn('Unable to create missing user profile during login:', createProfileError)
+        }
       }
 
       return { data: mapAuthUserToProfile(data.user), error: null }
